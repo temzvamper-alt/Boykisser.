@@ -1,504 +1,117 @@
--- Boykisser Hub | Custom UI (Based on Pulse Hub Style)
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+-- Загрузка библиотеки WindUI
+local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
+
+-- Создание главного окна
+local Window = WindUI:CreateWindow({
+    Title = "MM2 Delta Hub 🔪",
+    Icon = "rbxassetid://10723345862", -- Иконка
+    Author = "by Твой Брат",
+    Folder = "MM2_Delta_Config",
+    Size = UDim2.fromOffset(580, 360),
+    Transparent = true,
+    Theme = "Dark", -- Тёмная неоновая тема
+    SideBarWidth = 170,
+    HasOutline = true
+})
+
+-- Сервисы Roblox
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
 
--- Удаление старого UI
-if LocalPlayer.PlayerGui:FindFirstChild("BoykisserHubUI") then
-    LocalPlayer.PlayerGui.BoykisserHubUI:Destroy()
+-- Создание вкладок
+local MainTab = Window:Tab({ Title = "Главная", Icon = "user" })
+local VisualsTab = Window:Tab({ Title = "Визуалы (ESP)", Icon = "eye" })
+
+-- Переменные
+local speedEnabled = false
+local currentSpeed = 32
+local espEnabled = false
+
+-- ==================== ВКЛАДКА ГЛАВНАЯ ====================
+
+MainTab:Toggle({
+    Title = "Включить Спидхак",
+    Desc = "Увеличивает скорость перемещения",
+    Value = false,
+    Callback = function(Value)
+        speedEnabled = Value
+        if not Value and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        end
+    end
+})
+
+MainTab:Slider({
+    Title = "Скорость движения",
+    Value = 32,
+    Min = 16,
+    Max = 100,
+    Step = 1,
+    Callback = function(Value)
+        currentSpeed = Value
+    end
+})
+
+-- ==================== ВКЛАДКА ESP ====================
+
+local function getRoleColor(player)
+    if not player.Character then return Color3.fromRGB(255, 255, 255) end
+    if player.Backpack:FindFirstChild("Knife") or player.Character:FindFirstChild("Knife") then
+        return Color3.fromRGB(255, 55, 55) -- Убийца (Красный)
+    elseif player.Backpack:FindFirstChild("Gun") or player.Character:FindFirstChild("Gun") then
+        return Color3.fromRGB(55, 155, 255) -- Шериф (Синий)
+    else
+        return Color3.fromRGB(55, 255, 120) -- Мирный (Зеленый)
+    end
 end
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "BoykisserHubUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
----------------------------------------------------------
--- 1. ГЛАВНОЕ ОКНО
----------------------------------------------------------
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 620, 0, 380)
-MainFrame.Position = UDim2.new(0.5, -310, 0.5, -190)
-MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
-MainFrame.BorderSizePixel = 0
-MainFrame.ClipsDescendants = true
-MainFrame.Parent = ScreenGui
-
-local MainUICorner = Instance.new("UICorner", MainFrame)
-MainUICorner.CornerRadius = UDim.new(0, 10)
-
--- Боковое меню (Sidebar)
-local Sidebar = Instance.new("Frame", MainFrame)
-Sidebar.Name = "Sidebar"
-Sidebar.Size = UDim2.new(0, 150, 1, 0)
-Sidebar.BackgroundColor3 = Color3.fromRGB(14, 14, 16)
-Sidebar.BorderSizePixel = 0
-
--- Логотип в боковой панели
-local LogoFrame = Instance.new("Frame", Sidebar)
-LogoFrame.Size = UDim2.new(1, 0, 0, 50)
-LogoFrame.BackgroundTransparency = 1
-
-local LogoTitle = Instance.new("TextLabel", LogoFrame)
-LogoTitle.Text = "🐾 Boykisser Hub"
-LogoTitle.Size = UDim2.new(1, 0, 0, 24)
-LogoTitle.Position = UDim2.new(0, 12, 0, 10)
-LogoTitle.TextColor3 = Color3.fromRGB(220, 220, 230)
-LogoTitle.Font = Enum.Font.GothamBold
-LogoTitle.TextSize = 14
-LogoTitle.TextXAlignment = Enum.TextXAlignment.Left
-LogoTitle.BackgroundTransparency = 1
-
-local LogoSub = Instance.new("TextLabel", LogoFrame)
-LogoSub.Text = "Murder Mystery 2"
-LogoSub.Size = UDim2.new(1, 0, 0, 16)
-LogoSub.Position = UDim2.new(0, 12, 0, 28)
-LogoSub.TextColor3 = Color3.fromRGB(100, 100, 110)
-LogoSub.Font = Enum.Font.Gotham
-LogoSub.TextSize = 10
-LogoSub.TextXAlignment = Enum.TextXAlignment.Left
-LogoSub.BackgroundTransparency = 1
-
--- Список вкладок (Sidebar Buttons)
-local TabList = Instance.new("UIListLayout", Sidebar)
-TabList.Padding = UDim.new(0, 4)
-TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-TabList.SortOrder = Enum.SortOrder.LayoutOrder
-
-local Spacer = Instance.new("Frame", Sidebar)
-Spacer.Size = UDim2.new(1, 0, 0, 50)
-Spacer.BackgroundTransparency = 1
-Spacer.LayoutOrder = 0
-
-local function AddTabButton(name, icon, active, order)
-    local btn = Instance.new("Frame", Sidebar)
-    btn.Size = UDim2.new(0.88, 0, 0, 32)
-    btn.BackgroundColor3 = active and Color3.fromRGB(30, 30, 35) or Color3.fromRGB(14, 14, 16)
-    btn.BorderSizePixel = 0
-    btn.LayoutOrder = order
-    
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 6)
-    
-    if active then
-        local indicator = Instance.new("Frame", btn)
-        indicator.Size = UDim2.new(0, 3, 0, 16)
-        indicator.Position = UDim2.new(0, 2, 0.5, -8)
-        indicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Instance.new("UICorner", indicator).CornerRadius = UDim.new(0, 2)
-    end
-    
-    local txt = Instance.new("TextLabel", btn)
-    txt.Text = icon .. "  " .. name
-    txt.Size = UDim2.new(1, -10, 1, 0)
-    txt.Position = UDim2.new(0, 10, 0, 0)
-    txt.TextColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(120, 120, 130)
-    txt.Font = Enum.Font.GothamSemibold
-    txt.TextSize = 12
-    txt.TextXAlignment = Enum.TextXAlignment.Left
-    txt.BackgroundTransparency = 1
-end
-
-AddTabButton("Main", "🔲", true, 1)
-AddTabButton("Combat", "🎯", false, 2)
-AddTabButton("Auto Farm", "🪙", false, 3)
-AddTabButton("Teleport", "🚀", false, 4)
-AddTabButton("Visuals", "👁️", false, 5)
-AddTabButton("Settings", "⚙️", false, 6)
-
----------------------------------------------------------
--- 2. ВЕРХНЯЯ ПАНЕЛЬ (ПОИСК И КРЕСТИК)
----------------------------------------------------------
-local TopBar = Instance.new("Frame", MainFrame)
-TopBar.Size = UDim2.new(1, -150, 0, 45)
-TopBar.Position = UDim2.new(0, 150, 0, 0)
-TopBar.BackgroundTransparency = 1
-
--- Кнопка закрытия (Крестик)
-local CloseBtn = Instance.new("TextButton", TopBar)
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
-CloseBtn.Position = UDim2.new(1, -32, 0.5, -12)
-CloseBtn.Text = "✕"
-CloseBtn.TextColor3 = Color3.fromRGB(160, 160, 170)
-CloseBtn.BackgroundTransparency = 1
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.TextSize = 14
-
--- Кнопка сворачивания (-)
-local MinimizeBtn = Instance.new("TextButton", TopBar)
-MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
-MinimizeBtn.Position = UDim2.new(1, -60, 0.5, -12)
-MinimizeBtn.Text = "—"
-MinimizeBtn.TextColor3 = Color3.fromRGB(160, 160, 170)
-MinimizeBtn.BackgroundTransparency = 1
-MinimizeBtn.Font = Enum.Font.GothamBold
-MinimizeBtn.TextSize = 12
-
--- Поле поиска (Search)
-local SearchBox = Instance.new("Frame", TopBar)
-SearchBox.Size = UDim2.new(0, 140, 0, 26)
-SearchBox.Position = UDim2.new(1, -210, 0.5, -13)
-SearchBox.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-Instance.new("UICorner", SearchBox).CornerRadius = UDim.new(0, 6)
-
-local SearchIcon = Instance.new("TextLabel", SearchBox)
-SearchIcon.Text = "🔍"
-SearchIcon.Size = UDim2.new(0, 26, 1, 0)
-SearchIcon.BackgroundTransparency = 1
-SearchIcon.TextSize = 10
-SearchIcon.TextColor3 = Color3.fromRGB(120, 120, 130)
-
-local SearchInput = Instance.new("TextBox", SearchBox)
-SearchInput.Text = ""
-SearchInput.PlaceholderText = "Search..."
-SearchInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 110)
-SearchInput.Size = UDim2.new(1, -30, 1, 0)
-SearchInput.Position = UDim2.new(0, 25, 0, 0)
-SearchInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-SearchInput.Font = Enum.Font.Gotham
-SearchInput.TextSize = 11
-SearchInput.BackgroundTransparency = 1
-SearchInput.TextXAlignment = Enum.TextXAlignment.Left
-
----------------------------------------------------------
--- 3. ПЛАВАЮЩАЯ ИКОНКА СВОРAЧИВАНИЯ
----------------------------------------------------------
-local ToggleIcon = Instance.new("TextButton", ScreenGui)
-ToggleIcon.Name = "ToggleIcon"
-ToggleIcon.Size = UDim2.new(0, 48, 0, 48)
-ToggleIcon.Position = UDim2.new(0, 20, 0.5, -24)
-ToggleIcon.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
-ToggleIcon.Text = "🐾"
-ToggleIcon.TextSize = 22
-ToggleIcon.Visible = false
-ToggleIcon.Active = true
-
-local IconCorner = Instance.new("UICorner", ToggleIcon)
-IconCorner.CornerRadius = UDim.new(0, 12)
-
-local IconStroke = Instance.new("UIStroke", ToggleIcon)
-IconStroke.Color = Color3.fromRGB(60, 60, 70)
-IconStroke.Thickness = 1.5
-
--- Перетаскивание иконы и анимация
-local dragging, dragInput, dragStart, startPos
-local isDraggingIcon = false
-
-ToggleIcon.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        isDraggingIcon = false
-        dragStart = input.Position
-        startPos = ToggleIcon.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-ToggleIcon.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        if delta.Magnitude > 5 then
-            isDraggingIcon = true
-        end
-        ToggleIcon.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-MinimizeBtn.MouseButton1Click:Connect(function()
-    local tween = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = ToggleIcon.Position
-    })
-    tween:Play()
-    tween.Completed:Connect(function()
-        MainFrame.Visible = false
-        ToggleIcon.Visible = true
-        MainFrame.Size = UDim2.new(0, 620, 0, 380)
-    end)
-end)
-
-ToggleIcon.MouseButton1Click:Connect(function()
-    if not isDraggingIcon then
-        ToggleIcon.Visible = false
-        MainFrame.Position = ToggleIcon.Position
-        MainFrame.Size = UDim2.new(0, 0, 0, 0)
-        MainFrame.Visible = true
-
-        local targetPos = UDim2.new(0.5, -310, 0.5, -190)
-        local tween = TweenService:Create(MainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 620, 0, 380),
-            Position = targetPos
-        })
-        tween:Play()
-    end
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
----------------------------------------------------------
--- 4. СОДЕРЖИМОЕ ВКЛАДКИ MAIN
----------------------------------------------------------
-local ContentFrame = Instance.new("Frame", MainFrame)
-ContentFrame.Size = UDim2.new(1, -160, 1, -50)
-ContentFrame.Position = UDim2.new(0, 155, 0, 45)
-ContentFrame.BackgroundTransparency = 1
-
-local ScrollContainer = Instance.new("ScrollingFrame", ContentFrame)
-ScrollContainer.Size = UDim2.new(1, -5, 1, 0)
-ScrollContainer.BackgroundTransparency = 1
-ScrollContainer.BorderSizePixel = 0
-ScrollContainer.ScrollBarThickness = 3
-ScrollContainer.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 70)
-ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 500)
-
-local ContentLayout = Instance.new("UIListLayout", ScrollContainer)
-ContentLayout.Padding = UDim.new(0, 10)
-ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-
--- Создание Toggle элемента
-local function CreateToggle(name, default, callback)
-    local frame = Instance.new("Frame", ScrollContainer)
-    frame.Size = UDim2.new(0.96, 0, 0, 28)
-    frame.BackgroundTransparency = 1
-    
-    local label = Instance.new("TextLabel", frame)
-    label.Text = name
-    label.Size = UDim2.new(0.7, 0, 1, 0)
-    label.TextColor3 = Color3.fromRGB(200, 200, 210)
-    label.Font = Enum.Font.Gotham
-    label.TextSize = 12
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.BackgroundTransparency = 1
-
-    local switchBg = Instance.new("Frame", frame)
-    switchBg.Size = UDim2.new(0, 36, 0, 18)
-    switchBg.Position = UDim2.new(1, -40, 0.5, -9)
-    switchBg.BackgroundColor3 = default and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(40, 40, 48)
-    Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
-
-    local circle = Instance.new("Frame", switchBg)
-    circle.Size = UDim2.new(0, 14, 0, 14)
-    circle.Position = default and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
-    circle.BackgroundColor3 = default and Color3.fromRGB(20, 20, 25) or Color3.fromRGB(180, 180, 190)
-    Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
-
-    local state = default
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.BackgroundTransparency = 1
-    btn.Text = ""
-
-    btn.MouseButton1Click:Connect(function()
-        state = not state
-        local targetBg = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(40, 40, 48)
-        local targetCirclePos = state and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
-        local targetCircleColor = state and Color3.fromRGB(20, 20, 25) or Color3.fromRGB(180, 180, 190)
-
-        TweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = targetBg}):Play()
-        TweenService:Create(circle, TweenInfo.new(0.2), {Position = targetCirclePos, BackgroundColor3 = targetCircleColor}):Play()
-
-        callback(state)
-    end)
-end
-
--- Создание Slider элемента
-local function CreateSlider(name, min, max, default, callback)
-    local frame = Instance.new("Frame", ScrollContainer)
-    frame.Size = UDim2.new(0.96, 0, 0, 38)
-    frame.BackgroundTransparency = 1
-
-    local label = Instance.new("TextLabel", frame)
-    label.Text = name
-    label.Size = UDim2.new(0.6, 0, 0, 16)
-    label.TextColor3 = Color3.fromRGB(200, 200, 210)
-    label.Font = Enum.Font.Gotham
-    label.TextSize = 12
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.BackgroundTransparency = 1
-
-    local valueLabel = Instance.new("TextLabel", frame)
-    valueLabel.Text = tostring(default)
-    valueLabel.Size = UDim2.new(0.4, 0, 0, 16)
-    valueLabel.Position = UDim2.new(0.6, 0, 0, 0)
-    valueLabel.TextColor3 = Color3.fromRGB(140, 140, 150)
-    valueLabel.Font = Enum.Font.Gotham
-    valueLabel.TextSize = 11
-    valueLabel.TextXAlignment = Enum.TextXAlignment.Right
-    valueLabel.BackgroundTransparency = 1
-
-    local sliderBg = Instance.new("Frame", frame)
-    sliderBg.Size = UDim2.new(1, 0, 0, 6)
-    sliderBg.Position = UDim2.new(0, 0, 1, -8)
-    sliderBg.BackgroundColor3 = Color3.fromRGB(35, 35, 42)
-    Instance.new("UICorner", sliderBg).CornerRadius = UDim.new(1, 0)
-
-    local fill = Instance.new("Frame", sliderBg)
-    fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    Instance.new("UICorner", fill).CornerRadius = UDim.new(1, 0)
-
-    local btn = Instance.new("TextButton", sliderBg)
-    btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.BackgroundTransparency = 1
-    btn.Text = ""
-
-    local isSliding = false
-    local function Update(input)
-        local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
-        local val = math.floor(min + (max - min) * pos)
-        fill.Size = UDim2.new(pos, 0, 1, 0)
-        valueLabel.Text = tostring(val)
-        callback(val)
-    end
-
-    btn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isSliding = true
-            Update(input)
-        end
-    end)
-
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isSliding = false
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if isSliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            Update(input)
-        end
-    end)
-end
-
----------------------------------------------------------
--- 5. ФУНКЦИОНАЛ MAIN
----------------------------------------------------------
-local WalkSpeedVal = 16
-local JumpPowerVal = 50
-local GravityVal = 196.2
-local InfJump = false
-local Noclip = false
-local Fly = false
-local AirWalk = false
-local AntiFling = false
-local Fullbright = false
-local Freecam = false
-
-CreateSlider("Walkspeed", 16, 200, 16, function(v) WalkSpeedVal = v end)
-CreateSlider("Jumppower", 50, 250, 50, function(v) JumpPowerVal = v end)
-CreateSlider("Gravity", 0, 196, 196, function(v) workspace.Gravity = v end)
-CreateSlider("FOV", 70, 120, 70, function(v) Camera.FieldOfView = v end)
-
-CreateToggle("Infinite Jump", false, function(v) InfJump = v end)
-CreateToggle("Noclip", false, function(v) Noclip = v end)
-CreateToggle("Fly", false, function(v) Fly = v end)
-CreateToggle("Air walk", false, function(v) AirWalk = v end)
-CreateToggle("Anti fling", false, function(v) AntiFling = v end)
-CreateToggle("Fullbright", false, function(v) Fullbright = v end)
-CreateToggle("Freecam", false, function(v) Freecam = v end)
-
--- FPS Booster (Кнопка)
-local fpsBtn = Instance.new("TextButton", ScrollContainer)
-fpsBtn.Size = UDim2.new(0.96, 0, 0, 28)
-fpsBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
-fpsBtn.Text = "FPS Booster"
-fpsBtn.TextColor3 = Color3.fromRGB(200, 200, 210)
-fpsBtn.Font = Enum.Font.Gotham
-fpsBtn.TextSize = 11
-Instance.new("UICorner", fpsBtn).CornerRadius = UDim.new(0, 6)
-
-fpsBtn.MouseButton1Click:Connect(function()
-    for _, obj in pairs(game:GetDescendants()) do
-        if obj:IsA("Texture") or obj:IsA("Decal") then
-            obj:Destroy()
-        elseif obj:IsA("BasePart") then
-            obj.Material = Enum.Material.SmoothPlastic
-        end
-    end
-end)
-
----------------------------------------------------------
--- 6. ОБРАБОТЧИКИ СОБЫТИЙ В ИГРЕ
----------------------------------------------------------
-UserInputService.JumpRequest:Connect(function()
-    if InfJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid:ChangeState("Jumping")
-    end
-end)
-
-local AirPart = Instance.new("Part")
-AirPart.Size = Vector3.new(6, 1, 6)
-AirPart.Transparency = 0.8
-AirPart.Anchored = true
-AirPart.Color = Color3.fromRGB(255, 255, 255)
-
-local Light = Instance.new("PointLight")
-
-RunService.RenderStepped:Connect(function()
-    if LocalPlayer.Character then
-        local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
-        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-
-        if hum then hum.WalkSpeed = WalkSpeedVal end
-        if hum and hum.UseJumpPower then hum.JumpPower = JumpPowerVal end
-
-        if Noclip then
-            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
-                if part:IsA("BasePart") then part.CanCollide = false end
-            end
-        end
-
-        if Fly and hrp then
-            hrp.Velocity = Vector3.new(0, 0.1, 0)
-        end
-
-        if AirWalk and hrp then
-            AirPart.Position = hrp.Position - Vector3.new(0, 3.5, 0)
-        elseif not AirWalk then
-            AirPart.Position = Vector3.new(0, -500, 0)
-        end
-
-        if AntiFling then
+VisualsTab:Toggle({
+    Title = "ESP Ролей (Подсветка)",
+    Desc = "Показывает местоположение и роли игроков сквозь стены",
+    Value = false,
+    Callback = function(Value)
+        espEnabled = Value
+        if not Value then
             for _, player in pairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer and player.Character then
-                    for _, p in pairs(player.Character:GetDescendants()) do
-                        if p:IsA("BasePart") then p.CanCollide = false end
-                    end
+                if player.Character and player.Character:FindFirstChild("MM2_WindHighlight") then
+                    player.Character.MM2_WindHighlight:Destroy()
                 end
             end
         end
+    end
+})
 
-        if Fullbright and hrp then
-            Light.Parent = hrp
-            Light.Range = 200
-            Light.Brightness = 3
-        else
-            Light.Parent = nil
-        end
+-- ==================== ОСНОВНОЙ ЦИКЛ ====================
 
-        if Freecam then
-            Camera.CameraType = Enum.CameraType.Scriptable
-            Camera.CFrame = Camera.CFrame * CFrame.new(0, 0, -1)
-        elseif not Freecam and Camera.CameraType == Enum.CameraType.Scriptable then
-            Camera.CameraType = Enum.CameraType.Custom
+RunService.RenderStepped:Connect(function()
+    -- Применение скорости
+    if speedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = currentSpeed
+    end
+
+    -- Применение ESP
+    if espEnabled then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local highlight = player.Character:FindFirstChild("MM2_WindHighlight")
+                if not highlight then
+                    highlight = Instance.new("Highlight")
+                    highlight.Name = "MM2_WindHighlight"
+                    highlight.Parent = player.Character
+                end
+                highlight.FillColor = getRoleColor(player)
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                highlight.FillTransparency = 0.4
+            end
         end
     end
 end)
+
+-- Красивое уведомление
+WindUI:Notify({
+    Title = "MM2 Hub Успешно запущен!",
+    Content = "Приятной игры, брат! Всё работает на ура.",
+    Duration = 4,
+    Icon = "check"
+})
