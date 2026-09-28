@@ -1,0 +1,365 @@
+-- Boykisser Hub | Custom UI & Main Functions
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Создаем ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BoykisserHubUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+---------------------------------------------------------
+-- 1. ГЛАВНОЕ ОКНО
+---------------------------------------------------------
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 480, 0, 340)
+MainFrame.Position = UDim2.new(0.5, -240, 0.5, -170)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+local MainUICorner = Instance.new("UICorner", MainFrame)
+MainUICorner.CornerRadius = UDim.new(0, 12)
+
+-- Шапка (TopBar)
+local TopBar = Instance.new("Frame", MainFrame)
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundColor3 = Color3.fromRGB(35, 35, 42)
+TopBar.BorderSizePixel = 0
+
+local TopCorner = Instance.new("UICorner", TopBar)
+TopCorner.CornerRadius = UDim.new(0, 12)
+
+local Title = Instance.new("TextLabel", TopBar)
+Title.Text = "  🐾 Boykisser Hub | MM2"
+Title.Size = UDim2.new(0.6, 0, 1, 0)
+Title.TextColor3 = Color3.fromRGB(255, 180, 210)
+Title.Font = Enum.Font.Garamond
+Title.TextSize = 20
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.BackgroundTransparency = 1
+
+-- Кнопка Полного Закрытия (Крестик)
+local CloseBtn = Instance.new("TextButton", TopBar)
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0.5, -15)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 16
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+
+-- Кнопка Сворачивания (-)
+local MinimizeBtn = Instance.new("TextButton", TopBar)
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -70, 0.5, -15)
+MinimizeBtn.Text = "—"
+MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 14
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 6)
+
+---------------------------------------------------------
+-- 2. СВЕРНУТАЯ ИКОНКА (ПЛАВАЮЩИЙ КВАДРАТИК)
+---------------------------------------------------------
+local ToggleIcon = Instance.new("TextButton", ScreenGui)
+ToggleIcon.Name = "ToggleIcon"
+ToggleIcon.Size = UDim2.new(0, 50, 0, 50)
+ToggleIcon.Position = UDim2.new(0, 20, 0.5, -25)
+ToggleIcon.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+ToggleIcon.Text = "🐾"
+ToggleIcon.TextSize = 24
+ToggleIcon.Visible = false
+ToggleIcon.Active = true
+
+local IconCorner = Instance.new("UICorner", ToggleIcon)
+IconCorner.CornerRadius = UDim.new(0, 14)
+
+local IconStroke = Instance.new("UIStroke", ToggleIcon)
+IconStroke.Color = Color3.fromRGB(255, 180, 210)
+IconStroke.Thickness = 2
+
+---------------------------------------------------------
+-- ПЕРЕТАСКИВАНИЕ ИКОНКИ & ПЛАВНОЕ ОТКРЫТИЕ/ЗАКРЫТИЕ
+---------------------------------------------------------
+local dragging, dragInput, dragStart, startPos
+local isDraggingIcon = false
+
+ToggleIcon.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        isDraggingIcon = false
+        dragStart = input.Position
+        startPos = ToggleIcon.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+ToggleIcon.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        if delta.Magnitude > 5 then
+            isDraggingIcon = true
+        end
+        ToggleIcon.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Анимация сворачивания
+MinimizeBtn.MouseButton1Click:Connect(function()
+    local tween = TweenService:Create(MainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = ToggleIcon.Position
+    })
+    tween:Play()
+    tween.Completed:Connect(function()
+        MainFrame.Visible = false
+        ToggleIcon.Visible = true
+        MainFrame.Size = UDim2.new(0, 480, 0, 340)
+    end)
+end)
+
+-- Тап по иконке для разворачивания
+ToggleIcon.MouseButton1Click:Connect(function()
+    if not isDraggingIcon then
+        ToggleIcon.Visible = false
+        MainFrame.Position = ToggleIcon.Position
+        MainFrame.Size = UDim2.new(0, 0, 0, 0)
+        MainFrame.Visible = true
+
+        local targetPos = UDim2.new(0.5, -240, 0.5, -170)
+        local tween = TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 480, 0, 340),
+            Position = targetPos
+        })
+        tween:Play()
+    end
+end)
+
+-- Полный выход (крестик)
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+---------------------------------------------------------
+-- 3. СОДЕРЖИМОЕ ВКЛАДКИ MAIN
+---------------------------------------------------------
+local ScrollFrame = Instance.new("ScrollingFrame", MainFrame)
+ScrollFrame.Size = UDim2.new(1, -20, 1, -50)
+ScrollFrame.Position = UDim2.new(0, 10, 0, 45)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.ScrollBarThickness = 4
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 520)
+
+local UIList = Instance.new("UIListLayout", ScrollFrame)
+UIList.Padding = UDim.new(0, 8)
+UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Вспомогательная функция для переключателей (Toggles)
+local function CreateToggle(name, default, callback)
+    local state = default
+    local btn = Instance.new("TextButton", ScrollFrame)
+    btn.Size = UDim2.new(0.95, 0, 0, 35)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    btn.Text = "  " .. name .. ": " .. (state and "ВКЛ [ON]" or "ВЫКЛ [OFF]")
+    btn.TextColor3 = state and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 13
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.Text = "  " .. name .. ": " .. (state and "ВКЛ [ON]" or "ВЫКЛ [OFF]")
+        btn.TextColor3 = state and Color3.fromRGB(150, 255, 150) or Color3.fromRGB(255, 150, 150)
+        callback(state)
+    end)
+end
+
+-- Вспомогательная функция для кнопок
+local function CreateButton(name, callback)
+    local btn = Instance.new("TextButton", ScrollFrame)
+    btn.Size = UDim2.new(0.95, 0, 0, 35)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 13
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+    btn.MouseButton1Click:Connect(callback)
+end
+
+---------------------------------------------------------
+-- 4. ЛОГИКА И НАСТРОЙКИ ФУНКЦИЙ MAIN
+---------------------------------------------------------
+local WalkSpeedVal = 16
+local JumpPowerVal = 50
+local GravityVal = 196.2
+local InfJump = false
+local Noclip = false
+local Fly = false
+local AirWalk = false
+local AntiFling = false
+local Fullbright = false
+local Freecam = false
+
+-- 1. WalkSpeed
+CreateButton("⚡ WalkSpeed (Клик +10)", function()
+    WalkSpeedVal = WalkSpeedVal + 10
+    if WalkSpeedVal > 150 then WalkSpeedVal = 16 end
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = WalkSpeedVal
+    end
+end)
+
+-- 2. JumpPower
+CreateButton("🦘 JumpPower (Клик +20)", function()
+    JumpPowerVal = JumpPowerVal + 20
+    if JumpPowerVal > 200 then JumpPowerVal = 50 end
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.JumpPower = JumpPowerVal
+    end
+end)
+
+-- 3. Gravity
+CreateButton("🌌 Gravity (Сменить гравитацию)", function()
+    if workspace.Gravity == 196.2 then workspace.Gravity = 50 else workspace.Gravity = 196.2 end
+end)
+
+-- 4. Infinite Jump
+CreateToggle("🚀 Infinite Jump", false, function(v) InfJump = v end)
+UserInputService.JumpRequest:Connect(function()
+    if InfJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+    end
+end)
+
+-- 5. Noclip
+CreateToggle("👻 Noclip", false, function(v) Noclip = v end)
+
+-- 6. Fly
+CreateToggle("🕊️ Fly", false, function(v) Fly = v end)
+
+-- 7. Air Walk (Платформа под ногами)
+local AirPart = Instance.new("Part")
+AirPart.Size = Vector3.new(6, 1, 6)
+AirPart.Transparency = 0.6
+AirPart.Anchored = true
+AirPart.Color = Color3.fromRGB(255, 180, 210)
+
+CreateToggle("☁️ Air Walk", false, function(v) 
+    AirWalk = v 
+    if not v then AirPart.Position = Vector3.new(0, -500, 0) end
+end)
+
+-- 8. Anti Fling
+CreateToggle("🛡️ Anti Fling", false, function(v) AntiFling = v end)
+
+-- 9. FOV
+CreateButton("👁️ FOV Change (70 -> 100 -> 120)", function()
+    if Camera.FieldOfView == 70 then Camera.FieldOfView = 100 
+    elseif Camera.FieldOfView == 100 then Camera.FieldOfView = 120 
+    else Camera.FieldOfView = 70 end
+end)
+
+-- 10. Fullbright
+local Light = Instance.new("PointLight")
+CreateToggle("💡 Fullbright", false, function(v)
+    Fullbright = v
+    if v and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        Light.Parent = LocalPlayer.Character.HumanoidRootPart
+        Light.Range = 200
+        Light.Brightness = 3
+    else
+        Light.Parent = nil
+    end
+end)
+
+-- 11. Freecam
+CreateToggle("🎥 Freecam", false, function(v)
+    Freecam = v
+    if v then
+        Camera.CameraType = Enum.CameraType.Scriptable
+    else
+        Camera.CameraType = Enum.CameraType.Custom
+    end
+end)
+
+-- 12. FPS Booster
+CreateButton("🚀 FPS Booster (Оптимизация)", function()
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj:IsA("Texture") or obj:IsA("Decal") then
+            obj:Destroy()
+        elseif obj:IsA("BasePart") then
+            obj.Material = Enum.Material.SmoothPlastic
+        end
+    end
+end)
+
+---------------------------------------------------------
+-- ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ (RENDERSTEPPED)
+---------------------------------------------------------
+RunService.RenderStepped:Connect(function()
+    if LocalPlayer.Character then
+        local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
+        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if hum then
+            hum.WalkSpeed = WalkSpeedVal
+        end
+
+        -- Noclip
+        if Noclip then
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide = false end
+            end
+        end
+
+        -- Fly
+        if Fly and hrp then
+            hrp.Velocity = Vector3.new(0, 0.1, 0)
+        end
+
+        -- Air Walk
+        if AirWalk and hrp then
+            AirPart.Position = hrp.Position - Vector3.new(0, 3.5, 0)
+        end
+
+        -- Anti Fling
+        if AntiFling then
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    for _, p in pairs(player.Character:GetDescendants()) do
+                        if p:IsA("BasePart") then p.CanCollide = false end
+                    end
+                end
+            end
+        end
+
+        -- Freecam Управление
+        if Freecam and hrp then
+            Camera.CFrame = Camera.CFrame * CFrame.new(0, 0, -1)
+        end
+    end
+end)
+
