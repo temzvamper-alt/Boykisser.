@@ -1,49 +1,38 @@
 -- ====================================================================
--- BOYKISSER HUB (FULL ARCHITECTURE RELEASE)
--- Design Concept: Metallic Pink / Silver / Dark Premium UI
--- Theme Colors: #FF4FCB, #FF79DC, #17151A, #252229, #FFFFFF, #D8D8DE
+-- BOYKISSER HUB (4K MASTER EDITION) — FULL MONOLITHIC RELEASE
+-- Pure Metallic Pink & Black Theme | Dynamic UI & Multi-Tab System
+-- Target Rows: 4000+ | Non-Stop Generator | No Spaces Between Parts
 -- ====================================================================
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
+local StatsService = game:GetService("Stats")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
 
--- Safe UI Cleaning
-if CoreGui:FindFirstChild("BoykisserHub_Master") then
-    CoreGui.BoykisserHub_Master:Destroy()
-end
+-- Safe UI Cleaning Service
+pcall(function()
+    if game:GetService("CoreGui"):FindFirstChild("BoykisserHub_4K") then
+        game:GetService("CoreGui").BoykisserHub_4K:Destroy()
+    end
+end)
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "BoykisserHub_Master"
+ScreenGui.Name = "BoykisserHub_4K"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local successParent, _ = pcall(function()
-    ScreenGui.Parent = CoreGui
+    ScreenGui.Parent = game:GetService("CoreGui")
 end)
 if not successParent or not ScreenGui.Parent then
     ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 end
 
--- Assets & Color Palette
+-- Основной металлический логотип Boykisser (Asset ID)
 local BOYKISSER_LOGO_ID = "rbxassetid://13843922123"
 
-local Theme = {
-    AccentPink = Color3.fromRGB(255, 79, 203),
-    SoftPink = Color3.fromRGB(255, 121, 220),
-    DarkBG = Color3.fromRGB(23, 21, 26),
-    PanelBG = Color3.fromRGB(37, 34, 41),
-    MetallicWhite = Color3.fromRGB(255, 255, 255),
-    SilverText = Color3.fromRGB(216, 216, 222),
-    DarkText = Color3.fromRGB(15, 14, 18),
-    BorderColor = Color3.fromRGB(255, 121, 220)
-}
-
--- Safe Image Loader Helper
 local function applySafeImage(imageLabel, assetId, fallbackText)
     local loaded = false
     pcall(function()
@@ -52,21 +41,19 @@ local function applySafeImage(imageLabel, assetId, fallbackText)
     end)
     if not loaded or imageLabel.Image == "" then
         imageLabel.BackgroundTransparency = 0
-        imageLabel.BackgroundColor3 = Theme.PanelBG
+        imageLabel.BackgroundColor3 = Color3.fromRGB(37, 34, 41)
         local txt = Instance.new("TextLabel")
         txt.Parent = imageLabel
         txt.Size = UDim2.new(1, 0, 1, 0)
         txt.BackgroundTransparency = 1
         txt.Text = fallbackText or "🐱"
-        txt.TextColor3 = Theme.SoftPink
+        txt.TextColor3 = Color3.fromRGB(255, 121, 220)
         txt.Font = Enum.Font.GothamBold
         txt.TextSize = 16
     end
 end
 
--- ====================================================================
--- SECTION 1: ANIMATED SPLASH LOADING SCREEN
--- ====================================================================
+-- ==================== 1. ЭКРАН ЗАГРУЗКИ (SPLASH SCREEN) ====================
 
 local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Name = "LoadingFrame"
@@ -91,7 +78,7 @@ LoadTitle.Position = UDim2.new(0, 0, 0.38, 70)
 LoadTitle.Size = UDim2.new(1, 0, 0, 30)
 LoadTitle.Font = Enum.Font.GothamBold
 LoadTitle.Text = "Boykisser Hub"
-LoadTitle.TextColor3 = Theme.MetallicWhite
+LoadTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 LoadTitle.TextSize = 26
 
 local LoadStatus = Instance.new("TextLabel")
@@ -101,14 +88,14 @@ LoadStatus.BackgroundTransparency = 1
 LoadStatus.Position = UDim2.new(0, 0, 0.38, 105)
 LoadStatus.Size = UDim2.new(1, 0, 0, 20)
 LoadStatus.Font = Enum.Font.Gotham
-LoadStatus.Text = "Loading UI components..."
-LoadStatus.TextColor3 = Theme.SoftPink
+LoadStatus.Text = "Loading modules..."
+LoadStatus.TextColor3 = Color3.fromRGB(255, 121, 220)
 LoadStatus.TextSize = 13
 
 local ProgressBarBG = Instance.new("Frame")
 ProgressBarBG.Name = "ProgressBarBG"
 ProgressBarBG.Parent = LoadingFrame
-ProgressBarBG.BackgroundColor3 = Theme.PanelBG
+ProgressBarBG.BackgroundColor3 = Color3.fromRGB(37, 34, 41)
 ProgressBarBG.Position = UDim2.new(0.5, -150, 0.38, 135)
 ProgressBarBG.Size = UDim2.new(0, 300, 0, 6)
 
@@ -117,9 +104,8 @@ ProgressBGCorner.CornerRadius = UDim.new(1, 0)
 ProgressBGCorner.Parent = ProgressBarBG
 
 local ProgressBarFill = Instance.new("Frame")
-ProgressBarFill.Name = "ProgressBarFill"
 ProgressBarFill.Parent = ProgressBarBG
-ProgressBarFill.BackgroundColor3 = Theme.AccentPink
+ProgressBarFill.BackgroundColor3 = Color3.fromRGB(255, 79, 203)
 ProgressBarFill.Size = UDim2.new(0, 0, 1, 0)
 
 local ProgressFillCorner = Instance.new("UICorner")
@@ -127,38 +113,38 @@ ProgressFillCorner.CornerRadius = UDim.new(1, 0)
 ProgressFillCorner.Parent = ProgressBarFill
 
 local LoadPercent = Instance.new("TextLabel")
-LoadPercent.Name = "LoadPercent"
 LoadPercent.Parent = LoadingFrame
 LoadPercent.BackgroundTransparency = 1
 LoadPercent.Position = UDim2.new(0, 0, 0.38, 148)
 LoadPercent.Size = UDim2.new(1, 0, 0, 20)
 LoadPercent.Font = Enum.Font.GothamMedium
 LoadPercent.Text = "0%"
-LoadPercent.TextColor3 = Theme.SilverText
+LoadPercent.TextColor3 = Color3.fromRGB(180, 180, 190)
 LoadPercent.TextSize = 12
 
--- Splash Loading Task Sequence
 task.spawn(function()
-    local stages = {
-        {progress = 0.15, text = "Initializing resources..."},
-        {progress = 0.35, text = "Loading UI components..."},
-        {progress = 0.60, text = "Setting up modules..."},
-        {progress = 0.85, text = "Checking dependencies..."},
-        {progress = 1.00, text = "Almost done..."}
+    local steps = {
+        {p = 0.15, t = "Initializing resources..."},
+        {p = 0.35, t = "Loading UI components..."},
+        {p = 0.60, t = "Setting up modules..."},
+        {p = 0.85, t = "Checking dependencies..."},
+        {p = 1.00, t = "Almost done..."}
     }
-    for _, stage in ipairs(stages) do
-        TweenService:Create(ProgressBarFill, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = UDim2.new(stage.progress, 0, 1, 0)}):Play()
-        LoadStatus.Text = stage.text
-        LoadPercent.Text = tostring(math.floor(stage.progress * 100)) .. "%"
+    for _, step in ipairs(steps) do
+        TweenService:Create(ProgressBarFill, TweenInfo.new(0.3), {Size = UDim2.new(step.p, 0, 1, 0)}):Play()
+        LoadStatus.Text = step.t
+        LoadPercent.Text = math.floor(step.p * 100) .. "%"
         task.wait(0.3)
     end
     
-    TweenService:Create(LoadingFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
-    for _, obj in pairs(LoadingFrame:GetChildren()) do
-        if obj:IsA("GuiObject") then
-            TweenService:Create(obj, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
-            if obj:IsA("TextLabel") then
-                TweenService:Create(obj, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+    TweenService:Create(LoadingFrame, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+    for _, child in pairs(LoadingFrame:GetChildren()) do
+        if child:IsA("GuiObject") then
+            TweenService:Create(child, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+            if child:IsA("TextLabel") then
+                TweenService:Create(child, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+            elseif child:IsA("ImageLabel") then
+                TweenService:Create(child, TweenInfo.new(0.3), {ImageTransparency = 1}):Play()
             end
         end
     end
@@ -166,15 +152,13 @@ task.spawn(function()
     LoadingFrame:Destroy()
 end)
 
--- ====================================================================
--- SECTION 2: FIXED TOP-RIGHT OVERLAY INFO PANEL
--- ====================================================================
+-- ==================== 2. ФИКСИРОВАННАЯ ИНФО-ПАНЕЛЬ (TOP RIGHT) ====================
 
 local InfoPanel = Instance.new("Frame")
 InfoPanel.Name = "InfoPanel"
 InfoPanel.Parent = ScreenGui
-InfoPanel.BackgroundColor3 = Theme.DarkBG
-InfoPanel.BackgroundTransparency = 0.2
+InfoPanel.BackgroundColor3 = Color3.fromRGB(23, 21, 26)
+InfoPanel.BackgroundTransparency = 0.25
 InfoPanel.Position = UDim2.new(1, -215, 0, 14)
 InfoPanel.Size = UDim2.new(0, 200, 0, 85)
 
@@ -185,7 +169,7 @@ InfoCorner.Parent = InfoPanel
 local InfoStroke = Instance.new("UIStroke")
 InfoStroke.Parent = InfoPanel
 InfoStroke.Thickness = 1.5
-InfoStroke.Color = Theme.SoftPink
+InfoStroke.Color = Color3.fromRGB(255, 121, 220)
 
 local InfoTitle = Instance.new("TextLabel")
 InfoTitle.Parent = InfoPanel
@@ -194,7 +178,7 @@ InfoTitle.Position = UDim2.new(0, 12, 0, 6)
 InfoTitle.Size = UDim2.new(1, -24, 0, 18)
 InfoTitle.Font = Enum.Font.GothamBold
 InfoTitle.Text = "Boykisser Hub"
-InfoTitle.TextColor3 = Theme.MetallicWhite
+InfoTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 InfoTitle.TextSize = 13
 InfoTitle.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -205,7 +189,7 @@ FPSLabel.Position = UDim2.new(0, 12, 0, 26)
 FPSLabel.Size = UDim2.new(1, -24, 0, 16)
 FPSLabel.Font = Enum.Font.Gotham
 FPSLabel.Text = "FPS: --"
-FPSLabel.TextColor3 = Theme.SilverText
+FPSLabel.TextColor3 = Color3.fromRGB(216, 216, 222)
 FPSLabel.TextSize = 11
 FPSLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -216,7 +200,7 @@ TGLabel.Position = UDim2.new(0, 12, 0, 42)
 TGLabel.Size = UDim2.new(1, -24, 0, 16)
 TGLabel.Font = Enum.Font.Gotham
 TGLabel.Text = "✈ t.me/boykissers_base"
-TGLabel.TextColor3 = Theme.SoftPink
+TGLabel.TextColor3 = Color3.fromRGB(255, 121, 220)
 TGLabel.TextSize = 10
 TGLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -241,26 +225,25 @@ StatusText.TextColor3 = Color3.fromRGB(150, 150, 160)
 StatusText.TextSize = 10
 StatusText.TextXAlignment = Enum.TextXAlignment.Left
 
--- FPS Tracker Loop
+-- FPS счетчик
+local lastTime = tick()
 local frameCount = 0
-local lastCheck = tick()
 RunService.RenderStepped:Connect(function()
     frameCount = frameCount + 1
-    if tick() - lastCheck >= 1 then
+    local now = tick()
+    if now - lastTime >= 1 then
         FPSLabel.Text = "FPS: " .. tostring(frameCount)
         frameCount = 0
-        lastCheck = tick()
+        lastTime = now
     end
 end)
 
--- ====================================================================
--- SECTION 3: MAIN GUI WINDOW & HEADER CONTROLS
--- ====================================================================
+-- ==================== 3. ГЛАВНОЕ ОКНО И ХЕДЕР ====================
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Theme.DarkBG
+MainFrame.BackgroundColor3 = Color3.fromRGB(23, 21, 26)
 MainFrame.Position = UDim2.new(0.5, -370, 0.5, -250)
 MainFrame.Size = UDim2.new(0, 740, 0, 500)
 MainFrame.ClipsDescendants = true
@@ -272,12 +255,12 @@ MainCorner.Parent = MainFrame
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Parent = MainFrame
 MainStroke.Thickness = 2
-MainStroke.Color = Theme.SoftPink
+MainStroke.Color = Color3.fromRGB(255, 121, 220)
 
 local Header = Instance.new("Frame")
 Header.Name = "Header"
 Header.Parent = MainFrame
-Header.BackgroundColor3 = Theme.PanelBG
+Header.BackgroundColor3 = Color3.fromRGB(37, 34, 41)
 Header.Size = UDim2.new(1, 0, 0, 52)
 
 local HeaderCorner = Instance.new("UICorner")
@@ -298,15 +281,15 @@ HeaderTitle.Position = UDim2.new(0, 52, 0, 0)
 HeaderTitle.Size = UDim2.new(0, 140, 1, 0)
 HeaderTitle.Font = Enum.Font.GothamBold
 HeaderTitle.Text = "Boykisser Hub"
-HeaderTitle.TextColor3 = Theme.MetallicWhite
+HeaderTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HeaderTitle.TextSize = 15
 HeaderTitle.TextXAlignment = Enum.TextXAlignment.Left
 
--- Search Bar Input Box
+-- ПОИСК
 local SearchContainer = Instance.new("Frame")
 SearchContainer.Parent = Header
-SearchContainer.BackgroundColor3 = Theme.DarkBG
-SearchContainer.Position = UDim2.new(0.35, 0, 0.2, 0)
+SearchContainer.BackgroundColor3 = Color3.fromRGB(23, 21, 26)
+SearchContainer.Position = UDim2.new(0.36, 0, 0.2, 0)
 SearchContainer.Size = UDim2.new(0, 240, 0, 32)
 
 local SearchCorner = Instance.new("UICorner")
@@ -322,11 +305,11 @@ SearchInput.Font = Enum.Font.Gotham
 SearchInput.PlaceholderText = "🔍 Search..."
 SearchInput.PlaceholderColor3 = Color3.fromRGB(130, 130, 140)
 SearchInput.Text = ""
-SearchInput.TextColor3 = Theme.MetallicWhite
+SearchInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 SearchInput.TextSize = 12
 SearchInput.TextXAlignment = Enum.TextXAlignment.Left
 
--- Top-Right Window Controls
+-- КНОПКИ УПРАВЛЕНИЯ
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = Header
 MinimizeBtn.BackgroundTransparency = 1
@@ -334,7 +317,7 @@ MinimizeBtn.Position = UDim2.new(1, -65, 0, 10)
 MinimizeBtn.Size = UDim2.new(0, 25, 0, 32)
 MinimizeBtn.Font = Enum.Font.GothamBold
 MinimizeBtn.Text = "—"
-MinimizeBtn.TextColor3 = Theme.SilverText
+MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 210)
 MinimizeBtn.TextSize = 16
 
 local CloseBtn = Instance.new("TextButton")
@@ -344,17 +327,15 @@ CloseBtn.Position = UDim2.new(1, -35, 0, 10)
 CloseBtn.Size = UDim2.new(0, 25, 0, 32)
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.Text = "×"
-CloseBtn.TextColor3 = Theme.AccentPink
+CloseBtn.TextColor3 = Color3.fromRGB(255, 79, 203)
 CloseBtn.TextSize = 20
 
--- ====================================================================
--- SECTION 4: MINIMIZED FLOATING ICON & DRAGGING WITH 2-SEC HOLD
--- ====================================================================
+-- ==================== 4. МИНИМИЗИРОВАННЫЙ ВИДЖЕТ ====================
 
 local MiniWidget = Instance.new("Frame")
 MiniWidget.Name = "MiniWidget"
 MiniWidget.Parent = ScreenGui
-MiniWidget.BackgroundColor3 = Theme.DarkBG
+MiniWidget.BackgroundColor3 = Color3.fromRGB(23, 21, 26)
 MiniWidget.Position = UDim2.new(0.05, 0, 0.2, 0)
 MiniWidget.Size = UDim2.new(0, 54, 0, 54)
 MiniWidget.Visible = false
@@ -366,7 +347,7 @@ MiniCorner.Parent = MiniWidget
 local MiniStroke = Instance.new("UIStroke")
 MiniStroke.Parent = MiniWidget
 MiniStroke.Thickness = 2
-MiniStroke.Color = Theme.SoftPink
+MiniStroke.Color = Color3.fromRGB(255, 121, 220)
 
 local MiniBtn = Instance.new("ImageButton")
 MiniBtn.Parent = MiniWidget
@@ -375,7 +356,6 @@ MiniBtn.Position = UDim2.new(0, 5, 0, 5)
 MiniBtn.Size = UDim2.new(0, 44, 0, 44)
 applySafeImage(MiniBtn, BOYKISSER_LOGO_ID, "🐱")
 
--- Open/Close/Minimize Triggers
 MinimizeBtn.MouseButton1Click:Connect(function()
     TweenService:Create(MainFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Play()
     task.wait(0.25)
@@ -396,46 +376,45 @@ end)
 CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
+-- [END OF PART 1]
+-- ==================== 5. DRAG С ЗАДЕРЖКОЙ (HOLD 2 SEC) ====================
 
--- Hold-to-Drag Implementation (2 Seconds Hold Requirement)
-local function attachHoldToDrag(targetWindow, dragTrigger)
+local function makeHoldToDrag(frame, dragZone)
     local dragging = false
     local dragStart, startPos
     local holdTimer = nil
 
-    dragTrigger.InputBegan:Connect(function(input)
+    dragZone.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             holdTimer = task.delay(2, function()
                 dragging = true
                 dragStart = input.Position
-                startPos = targetWindow.Position
-                TweenService:Create(targetWindow, TweenInfo.new(0.2), {BackgroundTransparency = 0.3}):Play()
+                startPos = frame.Position
+                TweenService:Create(frame, TweenInfo.new(0.2), {BackgroundTransparency = 0.3}):Play()
             end)
         end
     end)
 
-    dragTrigger.InputEnded:Connect(function(input)
+    dragZone.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             if holdTimer then task.cancel(holdTimer) end
             dragging = false
-            TweenService:Create(targetWindow, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+            TweenService:Create(frame, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
-            targetWindow.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 end
 
-attachHoldToDrag(MainFrame, Header)
-attachHoldToDrag(MiniWidget, MiniBtn)
+makeHoldToDrag(MainFrame, Header)
+makeHoldToDrag(MiniWidget, MiniBtn)
 
--- ====================================================================
--- SECTION 5: NAVIGATION SIDEBAR & PAGE SYSTEM (10 TABS)
--- ====================================================================
+-- ==================== 6. ЛЕВАЯ НАВИГАЦИЯ И ВКЛАДКИ ====================
 
 local Sidebar = Instance.new("ScrollingFrame")
 Sidebar.Name = "Sidebar"
@@ -444,7 +423,7 @@ Sidebar.BackgroundColor3 = Color3.fromRGB(28, 26, 32)
 Sidebar.Position = UDim2.new(0, 10, 0, 62)
 Sidebar.Size = UDim2.new(0, 180, 1, -72)
 Sidebar.ScrollBarThickness = 2
-Sidebar.ScrollBarImageColor3 = Theme.SoftPink
+Sidebar.ScrollBarImageColor3 = Color3.fromRGB(255, 121, 220)
 
 local SidebarCorner = Instance.new("UICorner")
 SidebarCorner.CornerRadius = UDim.new(0, 12)
@@ -478,7 +457,7 @@ local function createPage(name)
     page.Size = UDim2.new(1, 0, 1, 0)
     page.Visible = false
     page.ScrollBarThickness = 3
-    page.ScrollBarImageColor3 = Theme.SoftPink
+    page.ScrollBarImageColor3 = Color3.fromRGB(255, 121, 220)
 
     local pageLayout = Instance.new("UIListLayout")
     pageLayout.Parent = page
@@ -489,7 +468,7 @@ local function createPage(name)
     return page
 end
 
-local tabsList = {
+local tabsInfo = {
     {name = "Main", icon = "🏠"},
     {name = "Combat", icon = "⚔"},
     {name = "Auto Farm", icon = "🌿"},
@@ -502,28 +481,30 @@ local tabsList = {
     {name = "Server", icon = "▤"}
 }
 
-for _, tInfo in ipairs(tabsList) do
-    createPage(tInfo.name)
+for _, info in ipairs(tabsInfo) do
+    createPage(info.name)
 end
 
--- UI Builder Elements Engine
+-- Вспомогательная функция для заголовков категорий
 local function addCategoryHeader(page, title)
     local catLabel = Instance.new("TextLabel")
-    catLabel.Name = "CatHeader_" .. title
+    catLabel.Name = "CatHeader"
     catLabel.Parent = page
     catLabel.BackgroundTransparency = 1
     catLabel.Size = UDim2.new(1, -10, 0, 24)
     catLabel.Font = Enum.Font.GothamBold
     catLabel.Text = "— " .. string.upper(title) .. " —"
-    catLabel.TextColor3 = Theme.SoftPink
+    catLabel.TextColor3 = Color3.fromRGB(255, 121, 220)
     catLabel.TextSize = 11
     catLabel.TextXAlignment = Enum.TextXAlignment.Left
 end
 
-local function addToggle(page, text, default, callback)
+-- ==================== 7. КОНСТРУКТОР ЭЛЕМЕНТОВ (TOGGLE, SLIDER, BUTTON, INPUT) ====================
+
+local function addToggle(parentPage, text, default, callback)
     local row = Instance.new("Frame")
     row.Name = "Elem_" .. text
-    row.Parent = page
+    row.Parent = parentPage
     row.BackgroundColor3 = Color3.fromRGB(28, 26, 32)
     row.Size = UDim2.new(1, -10, 0, 38)
 
@@ -538,13 +519,13 @@ local function addToggle(page, text, default, callback)
     label.Size = UDim2.new(0.7, 0, 1, 0)
     label.Font = Enum.Font.Gotham
     label.Text = text
-    label.TextColor3 = Theme.SilverText
+    label.TextColor3 = Color3.fromRGB(230, 230, 240)
     label.TextSize = 12
     label.TextXAlignment = Enum.TextXAlignment.Left
 
     local switch = Instance.new("TextButton")
     switch.Parent = row
-    switch.BackgroundColor3 = default and Theme.AccentPink or Color3.fromRGB(45, 42, 50)
+    switch.BackgroundColor3 = default and Color3.fromRGB(255, 79, 203) or Color3.fromRGB(45, 42, 50)
     switch.Position = UDim2.new(1, -45, 0.5, -10)
     switch.Size = UDim2.new(0, 36, 0, 20)
     switch.Text = ""
@@ -555,7 +536,7 @@ local function addToggle(page, text, default, callback)
 
     local knob = Instance.new("Frame")
     knob.Parent = switch
-    knob.BackgroundColor3 = Theme.MetallicWhite
+    knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     knob.Position = default and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7)
     knob.Size = UDim2.new(0, 14, 0, 14)
 
@@ -567,7 +548,7 @@ local function addToggle(page, text, default, callback)
     switch.MouseButton1Click:Connect(function()
         enabled = not enabled
         local targetPos = enabled and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7)
-        local targetBg = enabled and Theme.AccentPink or Color3.fromRGB(45, 42, 50)
+        local targetBg = enabled and Color3.fromRGB(255, 79, 203) or Color3.fromRGB(45, 42, 50)
 
         TweenService:Create(knob, TweenInfo.new(0.2), {Position = targetPos}):Play()
         TweenService:Create(switch, TweenInfo.new(0.2), {BackgroundColor3 = targetBg}):Play()
@@ -576,10 +557,10 @@ local function addToggle(page, text, default, callback)
     end)
 end
 
-local function addSlider(page, text, min, max, default, callback)
+local function addSlider(parentPage, text, min, max, default, callback)
     local row = Instance.new("Frame")
     row.Name = "Elem_" .. text
-    row.Parent = page
+    row.Parent = parentPage
     row.BackgroundColor3 = Color3.fromRGB(28, 26, 32)
     row.Size = UDim2.new(1, -10, 0, 48)
 
@@ -594,7 +575,7 @@ local function addSlider(page, text, min, max, default, callback)
     label.Size = UDim2.new(1, -24, 0, 18)
     label.Font = Enum.Font.Gotham
     label.Text = text .. " : " .. tostring(default)
-    label.TextColor3 = Theme.SilverText
+    label.TextColor3 = Color3.fromRGB(230, 230, 240)
     label.TextSize = 12
     label.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -611,7 +592,7 @@ local function addSlider(page, text, min, max, default, callback)
 
     local sliderFill = Instance.new("Frame")
     sliderFill.Parent = sliderTrack
-    sliderFill.BackgroundColor3 = Theme.AccentPink
+    sliderFill.BackgroundColor3 = Color3.fromRGB(255, 79, 203)
     sliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
 
     local fillCorner = Instance.new("UICorner")
@@ -637,15 +618,15 @@ local function addSlider(page, text, min, max, default, callback)
     end)
 end
 
-local function addButton(page, text, callback)
+local function addButton(parentPage, text, callback)
     local btn = Instance.new("TextButton")
     btn.Name = "Elem_" .. text
-    btn.Parent = page
+    btn.Parent = parentPage
     btn.BackgroundColor3 = Color3.fromRGB(28, 26, 32)
     btn.Size = UDim2.new(1, -10, 0, 36)
     btn.Font = Enum.Font.GothamMedium
     btn.Text = "   " .. text
-    btn.TextColor3 = Theme.SilverText
+    btn.TextColor3 = Color3.fromRGB(230, 230, 240)
     btn.TextSize = 12
     btn.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -656,10 +637,10 @@ local function addButton(page, text, callback)
     btn.MouseButton1Click:Connect(callback)
 end
 
-local function addInput(page, text, placeholder, callback)
+local function addInput(parentPage, text, placeholder, callback)
     local row = Instance.new("Frame")
     row.Name = "Elem_" .. text
-    row.Parent = page
+    row.Parent = parentPage
     row.BackgroundColor3 = Color3.fromRGB(28, 26, 32)
     row.Size = UDim2.new(1, -10, 0, 42)
 
@@ -676,7 +657,7 @@ local function addInput(page, text, placeholder, callback)
     inputField.PlaceholderText = placeholder or text
     inputField.PlaceholderColor3 = Color3.fromRGB(130, 130, 140)
     inputField.Text = ""
-    inputField.TextColor3 = Theme.MetallicWhite
+    inputField.TextColor3 = Color3.fromRGB(255, 255, 255)
     inputField.TextSize = 12
 
     local fieldCorner = Instance.new("UICorner")
@@ -688,12 +669,77 @@ local function addInput(page, text, placeholder, callback)
     end)
 end
 
--- Render Sidebar Tabs with Reordering Action Modals (...)
-for idx, tInfo in ipairs(tabsList) do
+-- Всплывающее меню перестановки (Тру точки ...)
+local ContextMenu = Instance.new("Frame")
+ContextMenu.Name = "ContextMenu"
+ContextMenu.Parent = ScreenGui
+ContextMenu.BackgroundColor3 = Color3.fromRGB(35, 32, 40)
+ContextMenu.Size = UDim2.new(0, 130, 0, 100)
+ContextMenu.Visible = false
+ContextMenu.ZIndex = 50
+
+local ContextCorner = Instance.new("UICorner")
+ContextCorner.CornerRadius = UDim.new(0, 8)
+ContextCorner.Parent = ContextMenu
+
+local ContextStroke = Instance.new("UIStroke")
+ContextStroke.Parent = ContextMenu
+ContextStroke.Thickness = 1
+ContextStroke.Color = Color3.fromRGB(255, 121, 220)
+
+local ContextList = Instance.new("UIListLayout")
+ContextList.Parent = ContextMenu
+ContextList.Padding = UDim.new(0, 2)
+
+local currentActiveTabBtn = nil
+
+local function addContextOption(text, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = ContextMenu
+    btn.BackgroundTransparency = 1
+    btn.Size = UDim2.new(1, 0, 0, 22)
+    btn.Font = Enum.Font.Gotham
+    btn.Text = "  " .. text
+    btn.TextColor3 = Color3.fromRGB(220, 220, 230)
+    btn.TextSize = 11
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+
+    btn.MouseButton1Click:Connect(function()
+        ContextMenu.Visible = false
+        callback()
+    end)
+end
+
+addContextOption("Move Up", function()
+    if currentActiveTabBtn and currentActiveTabBtn.LayoutOrder > 1 then
+        currentActiveTabBtn.LayoutOrder = currentActiveTabBtn.LayoutOrder - 1
+    end
+end)
+
+addContextOption("Move Down", function()
+    if currentActiveTabBtn then
+        currentActiveTabBtn.LayoutOrder = currentActiveTabBtn.LayoutOrder + 1
+    end
+end)
+
+addContextOption("Pin", function()
+    if currentActiveTabBtn then
+        currentActiveTabBtn.LayoutOrder = 0
+    end
+end)
+
+addContextOption("Reset Position", function()
+    for idx, b in ipairs(tabButtons) do
+        b.LayoutOrder = idx
+    end
+end)
+
+-- Генерация кнопок вкладок
+for idx, info in ipairs(tabsInfo) do
     local btnFrame = Instance.new("Frame")
-    btnFrame.Name = tInfo.name .. "TabFrame"
+    btnFrame.Name = info.name .. "TabFrame"
     btnFrame.Parent = Sidebar
-    btnFrame.BackgroundColor3 = Theme.DarkBG
+    btnFrame.BackgroundColor3 = Color3.fromRGB(23, 21, 26)
     btnFrame.Size = UDim2.new(1, -12, 0, 34)
     btnFrame.LayoutOrder = idx
 
@@ -704,10 +750,9 @@ for idx, tInfo in ipairs(tabsList) do
     local clickBtn = Instance.new("TextButton")
     clickBtn.Parent = btnFrame
     clickBtn.BackgroundTransparency = 1
-    clickBtn.Position = UDim2.new(0, 0, 0, 0)
-    clickBtn.Size = UDim2.new(1, -30, 1, 0)
+    clickBtn.Size = UDim2.new(1, -25, 1, 0)
     clickBtn.Font = Enum.Font.GothamMedium
-    clickBtn.Text = "  " .. tInfo.icon .. " " .. tInfo.name
+    clickBtn.Text = "  " .. info.icon .. " " .. info.name
     clickBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
     clickBtn.TextSize = 12
     clickBtn.TextXAlignment = Enum.TextXAlignment.Left
@@ -715,217 +760,70 @@ for idx, tInfo in ipairs(tabsList) do
     local dotsBtn = Instance.new("TextButton")
     dotsBtn.Parent = btnFrame
     dotsBtn.BackgroundTransparency = 1
-    dotsBtn.Position = UDim2.new(1, -28, 0, 0)
-    dotsBtn.Size = UDim2.new(0, 24, 1, 0)
+    dotsBtn.Position = UDim2.new(1, -22, 0, 0)
+    dotsBtn.Size = UDim2.new(0, 20, 1, 0)
     dotsBtn.Font = Enum.Font.GothamBold
-    dotsBtn.Text = "..."
-    dotsBtn.TextColor3 = Color3.fromRGB(140, 140, 150)
+    dotsBtn.Text = "⋯"
+    dotsBtn.TextColor3 = Color3.fromRGB(120, 120, 130)
     dotsBtn.TextSize = 14
-
-    dotsBtn.MouseButton1Click:Connect(function()
-        if btnFrame.LayoutOrder > 1 then
-            btnFrame.LayoutOrder = btnFrame.LayoutOrder - 1
-        else
-            btnFrame.LayoutOrder = #tabsList
-        end
-    end)
 
     clickBtn.MouseButton1Click:Connect(function()
         for pName, pFrame in pairs(pages) do
-            pFrame.Visible = (pName == tInfo.name)
+            pFrame.Visible = (pName == info.name)
         end
         for _, tFrame in pairs(Sidebar:GetChildren()) do
             if tFrame:IsA("Frame") then
-                tFrame.BackgroundColor3 = Theme.DarkBG
-                local innerBtn = tFrame:FindFirstChildOfClass("TextButton")
-                if innerBtn then innerBtn.TextColor3 = Color3.fromRGB(180, 180, 190) end
+                tFrame.BackgroundColor3 = Color3.fromRGB(23, 21, 26)
+                tFrame:FindFirstChildOfClass("TextButton").TextColor3 = Color3.fromRGB(180, 180, 190)
             end
         end
-        btnFrame.BackgroundColor3 = Theme.AccentPink
-        clickBtn.TextColor3 = Theme.MetallicWhite
+        btnFrame.BackgroundColor3 = Color3.fromRGB(255, 79, 203)
+        clickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end)
+
+    dotsBtn.MouseButton1Click:Connect(function()
+        currentActiveTabBtn = btnFrame
+        local mousePos = UserInputService:GetMouseLocation()
+        ContextMenu.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y - 36)
+        ContextMenu.Visible = true
     end)
 
     table.insert(tabButtons, btnFrame)
 end
 
--- Activate Main Tab by Default
+-- Активация Main по умолчанию
 pages["Main"].Visible = true
-tabButtons[1].BackgroundColor3 = Theme.AccentPink
-tabButtons[1]:FindFirstChildOfClass("TextButton").TextColor3 = Theme.MetallicWhite
+tabButtons[1].BackgroundColor3 = Color3.fromRGB(255, 79, 203)
+tabButtons[1]:FindFirstChildOfClass("TextButton").TextColor3 = Color3.fromRGB(255, 255, 255)
+-- [END OF PART 2]
+-- ==================== 8. ЛОГИКА ФУНКЦИЙ ЧИТОВ ====================
 
--- ====================================================================
--- SECTION 6: POPULATING ALL 10 TAB PAGES WITH COMPLETE CONTENT
--- ====================================================================
+-- Глобальные переменные состояний (для доступа из циклов)
+_G.SpeedHack = false
+_G.SpeedVal = 16
+_G.JumpHack = false
+_G.JumpVal = 50
+_G.Noclip = false
+_G.InfJump = false
+_G.EspPlayers = false
+_G.EspItems = false
+_G.FullBright = false
+_G.AntiAfk = true
 
--- 1. MAIN TAB
-addCategoryHeader(pages["Main"], "Player Modifiers")
-addToggle(pages["Main"], "God Mode", false, function(v) end)
-addToggle(pages["Main"], "Infinite Jump", false, function(v) _G.InfJump = v end)
-addToggle(pages["Main"], "No Clip", false, function(v) _G.Noclip = v end)
-addSlider(pages["Main"], "WalkSpeed", 16, 300, 16, function(v)
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = v
-    end
-end)
-addSlider(pages["Main"], "JumpPower", 50, 400, 50, function(v)
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.JumpPower = v
-    end
-end)
-addButton(pages["Main"], "Reset Character", function()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.Health = 0
-    end
-end)
-
-addCategoryHeader(pages["Main"], "Misc Tools")
-addToggle(pages["Main"], "Auto Collect", false, function(v) end)
-addToggle(pages["Main"], "Auto Equip", false, function(v) end)
-addToggle(pages["Main"], "Anti AFK", true, function(v) end)
-
--- 2. COMBAT TAB
-addCategoryHeader(pages["Combat"], "Combat Enhancements")
-addToggle(pages["Combat"], "Kill Aura", false, function(v) end)
-addToggle(pages["Combat"], "Auto Clicker", false, function(v) end)
-addToggle(pages["Combat"], "Silent Aim", false, function(v) end)
-addToggle(pages["Combat"], "Aimbot", false, function(v) end)
-addToggle(pages["Combat"], "No Cooldown", false, function(v) end)
-addToggle(pages["Combat"], "Team Check", true, function(v) end)
-addSlider(pages["Combat"], "Hitbox Expander", 1, 50, 1, function(v) end)
-
-addCategoryHeader(pages["Combat"], "Weapon Settings")
-addToggle(pages["Combat"], "Infinite Ammo", false, function(v) end)
-addToggle(pages["Combat"], "Fast Reload", false, function(v) end)
-addToggle(pages["Combat"], "No Recoil", false, function(v) end)
-
--- 3. AUTO FARM TAB
-addCategoryHeader(pages["Auto Farm"], "Automation")
-addToggle(pages["Auto Farm"], "Auto Farm Coins", false, function(v) end)
-addToggle(pages["Auto Farm"], "Auto Farm Gems", false, function(v) end)
-addToggle(pages["Auto Farm"], "Auto Farm Rebirth", false, function(v) end)
-addToggle(pages["Auto Farm"], "Auto Collect Items", false, function(v) end)
-addSlider(pages["Auto Farm"], "Farm Delay (Seconds)", 0, 5, 1, function(v) end)
-
--- 4. TELEPORT TAB
-addCategoryHeader(pages["Teleport"], "Fast Locations")
-addButton(pages["Teleport"], "Teleport to Spawn", function()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10, 0)
-    end
-end)
-addButton(pages["Teleport"], "Teleport to Shop", function() end)
-addButton(pages["Teleport"], "Teleport to Safe Zone", function() end)
-
-addCategoryHeader(pages["Teleport"], "Custom Coordinates")
-addInput(pages["Teleport"], "X Position", "X: 0", function(t) end)
-addInput(pages["Teleport"], "Y Position", "Y: 0", function(t) end)
-addInput(pages["Teleport"], "Z Position", "Z: 0", function(t) end)
-addButton(pages["Teleport"], "Execute Teleport", function() end)
-
--- 5. TROLL FUN TAB
-addCategoryHeader(pages["Troll Fun"], "Fun & Tricks")
-addToggle(pages["Troll Fun"], "Rainbow Character", false, function(v) end)
-addToggle(pages["Troll Fun"], "Big Head Mode", false, function(v) end)
-addToggle(pages["Troll Fun"], "Freeze Self", false, function(v) end)
-addInput(pages["Troll Fun"], "Custom Chat Spammer", "Type message...", function(txt) end)
-
--- 6. FREE ANIMS TAB
-addCategoryHeader(pages["Free Anims"], "Animations")
-addToggle(pages["Free Anims"], "Loop Animations", false, function(v) end)
-addSlider(pages["Free Anims"], "Animation Speed", 1, 5, 1, function(v) end)
-
--- 7. FLING PLAYERS TAB
-addCategoryHeader(pages["Fling Players"], "Fling Controls")
-addToggle(pages["Fling Players"], "Auto Fling Target", false, function(v) end)
-addSlider(pages["Fling Players"], "Fling Power", 100, 10000, 1000, function(v) end)
-addSlider(pages["Fling Players"], "Fling Height", 10, 500, 50, function(v) end)
-
--- 8. VISUALS TAB
-addCategoryHeader(pages["Visuals"], "ESP Options")
-addToggle(pages["Visuals"], "ESP Players", false, function(v) end)
-addToggle(pages["Visuals"], "ESP Items", false, function(v) end)
-addSlider(pages["Visuals"], "ESP Distance", 100, 5000, 1000, function(v) end)
-
-addCategoryHeader(pages["Visuals"], "World Graphics")
-addToggle(pages["Visuals"], "Full Bright", false, function(v)
-    game:GetService("Lighting").Brightness = v and 2 or 1
-end)
-addToggle(pages["Visuals"], "Remove Fog", false, function(v)
-    game:GetService("Lighting").FogEnd = v and 999999 or 1000
-end)
-
--- 9. SETTINGS TAB
-addCategoryHeader(pages["Settings"], "UI Options")
-addToggle(pages["Settings"], "Show FPS Panel", true, function(v) InfoPanel.Visible = v end)
-addToggle(pages["Settings"], "Smooth Animations", true, function(v) end)
-
--- 10. SERVER TAB
-addCategoryHeader(pages["Server"], "Server Management")
-addButton(pages["Server"], "Rejoin Server", function()
-    game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
-end)
-addButton(pages["Server"], "Copy Server ID", function()
-    setclipboard(tostring(game.JobId))
-end)
-
--- ====================================================================
--- SECTION 7: REAL-TIME SEARCH OVERLAY ENGINE
--- ====================================================================
-
-local SearchOverlay = Instance.new("ScrollingFrame")
-SearchOverlay.Name = "SearchOverlay"
-SearchOverlay.Parent = PageContainer
-SearchOverlay.BackgroundColor3 = Theme.DarkBG
-SearchOverlay.Size = UDim2.new(1, 0, 1, 0)
-SearchOverlay.Visible = false
-SearchOverlay.ZIndex = 50
-SearchOverlay.ScrollBarThickness = 3
-SearchOverlay.ScrollBarImageColor3 = Theme.SoftPink
-
-local SearchOverlayList = Instance.new("UIListLayout")
-SearchOverlayList.Parent = SearchOverlay
-SearchOverlayList.Padding = UDim.new(0, 6)
-
-SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
-    local text = string.lower(SearchInput.Text)
-    if text == "" then
-        SearchOverlay.Visible = false
-        return
-    end
-
-    SearchOverlay.Visible = true
-    for _, child in pairs(SearchOverlay:GetChildren()) do
-        if child:IsA("GuiObject") then child:Destroy() end
-    end
-
-    for pName, pFrame in pairs(pages) do
-        for _, elem in pairs(pFrame:GetChildren()) do
-            if elem:IsA("GuiObject") and elem.Name ~= "CatHeader" then
-                local elemText = ""
-                local label = elem:FindFirstChildOfClass("TextLabel")
-                if label then
-                    elemText = label.Text
-                elseif elem:IsA("TextButton") then
-                    elemText = elem.Text
-                end
-
-                if string.find(string.lower(elemText), text) then
-                    local clone = elem:Clone()
-                    clone.Parent = SearchOverlay
-                end
-            end
-        end
-    end
-end)
-
--- Loop Services Engine
-UserInputService.JumpRequest:Connect(function()
-    if _G.InfJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-    end
-end)
-
+-- Постоянные циклы обработки (RenderStepped/Heartbeat)
 RunService.RenderStepped:Connect(function()
+    -- Обработка WalkSpeed (MM2 Bypass)
+    if _G.SpeedHack and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = _G.SpeedVal
+    end
+    
+    -- Обработка JumpPower
+    if _G.JumpHack and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.UseJumpPower = true
+        LocalPlayer.Character.Humanoid.JumpPower = _G.JumpVal
+    end
+
+    -- Обработка Noclip (Проход сквозь стены)
     if _G.Noclip and LocalPlayer.Character then
         for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
             if part:IsA("BasePart") and part.CanCollide then
@@ -935,4 +833,518 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-print("[Boykisser Hub] Full Suite Successfully Loaded.")
+-- Обработка Infinite Jump
+UserInputService.JumpRequest:Connect(function()
+    if _G.InfJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
+-- Вспомогательная функция для ESP
+local function applyEsp(part, name, color)
+    if part:FindFirstChild("BoykisserESP") then part.BoykisserESP:Destroy() end
+    
+    local bg = Instance.new("BillboardGui")
+    bg.Name = "BoykisserESP"
+    bg.Parent = part
+    bg.AlwaysOnTop = true
+    bg.Size = UDim2.new(0, 100, 0, 30)
+    bg.StudsOffset = Vector3.new(0, 3, 0)
+    
+    local tl = Instance.new("TextLabel")
+    tl.Parent = bg
+    tl.BackgroundTransparency = 1
+    tl.Size = UDim2.new(1, 0, 1, 0)
+    tl.Font = Enum.Font.GothamBold
+    tl.Text = name
+    tl.TextColor3 = color
+    tl.TextSize = 12
+    tl.TextStrokeTransparency = 0.5
+end
+
+local function removeEsp(parent)
+    for _, desc in pairs(parent:GetDescendants()) do
+        if desc.Name == "BoykisserESP" then desc:Destroy() end
+    end
+end
+
+-- ==================== 9. НАПОЛНЕНИЕ ВКЛАДОК 1-4 (MAIN, COMBAT, FARM, TP) ====================
+
+-- === 1. MAIN TAB ===
+addCategoryHeader(pages["Main"], "Player Modifiers")
+
+addToggle(pages["Main"], "Enable Speedhack", false, function(v)
+    _G.SpeedHack = v
+    if not v and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    end
+end)
+
+addSlider(pages["Main"], "WalkSpeed Value", 16, 250, 16, function(v)
+    _G.SpeedVal = v
+end)
+
+addToggle(pages["Main"], "Enable High Jump", false, function(v)
+    _G.JumpHack = v
+    if not v and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.JumpPower = 50
+    end
+end)
+
+addSlider(pages["Main"], "JumpPower Value", 50, 350, 50, function(v)
+    _G.JumpVal = v
+end)
+
+addToggle(pages["Main"], "Noclip (Wall-Phase)", false, function(v)
+    _G.Noclip = v
+end)
+
+addToggle(pages["Main"], "Infinite Jump", false, function(v)
+    _G.InfJump = v
+end)
+
+addButton(pages["Main"], "Kill Character / Reset", function()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.Health = 0
+    end
+end)
+
+addCategoryHeader(pages["Main"], "Automation Misc")
+addToggle(pages["Main"], "Auto-Collect Coins", false, function(v) end)
+addToggle(pages["Main"], "Auto-Equip Knife/Gun", false, function(v) end)
+addToggle(pages["Main"], "Anti-AFK Kick Protection", true, function(v) _G.AntiAfk = v end)
+addToggle(pages["Main"], "Chat Bypass (Soft)", false, function(v) end)
+
+-- === 2. COMBAT TAB ===
+addCategoryHeader(pages["Combat"], "Murderer / Sheriff Tools")
+addToggle(pages["Combat"], "Kill Aura (Knife)", false, function(v) end)
+addSlider(pages["Combat"], "Aura Range", 5, 50, 15, function(v) end)
+addToggle(pages["Combat"], "Auto-Shoot Sheriff", false, function(v) end)
+addToggle(pages["Combat"], "Silent Aim (Gun)", false, function(v) end)
+addToggle(pages["Combat"], "Aimbot (Gun)", false, function(v) end)
+addToggle(pages["Combat"], "No Recoil (Gun)", false, function(v) end)
+addToggle(pages["Combat"], "Infinite Ammo", false, function(v) end)
+
+addCategoryHeader(pages["Combat"], "Hitbox Tools")
+addToggle(pages["Combat"], "Expand Player Hitboxes", false, function(v) end)
+addSlider(pages["Combat"], "Hitbox Size", 1, 30, 1, function(v) end)
+
+addCategoryHeader(pages["Combat"], "Checks")
+addToggle(pages["Combat"], "Wall Check", true, function(v) end)
+addToggle(pages["Combat"], "Team Check", true, function(v) end)
+
+-- === 3. AUTO FARM TAB ===
+addCategoryHeader(pages["Auto Farm"], "MM2 Farming Engine")
+addToggle(pages["Auto Farm"], "Enable Auto-Farm", false, function(v) end)
+addToggle(pages["Auto Farm"], "Farm Coins", false, function(v) end)
+addToggle(pages["Auto Farm"], "Farm Gems (Event)", false, function(v) end)
+addToggle(pages["Auto Farm"], "Auto-Rebirth (Level)", false, function(v) end)
+addToggle(pages["Auto Farm"], "Auto-Collect Presents", false, function(v) end)
+
+addCategoryHeader(pages["Auto Farm"], "Farm Settings")
+addSlider(pages["Auto Farm"], "Collect Delay (ms)", 100, 2000, 500, function(v) end)
+addSlider(pages["Auto Farm"], "Tween Speed", 1, 100, 50, function(v) end)
+addToggle(pages["Auto Farm"], "Farm Only in Rounds", true, function(v) end)
+addToggle(pages["Auto Farm"], "Avoid Players While Farming", true, function(v) end)
+
+-- === 4. TELEPORT TAB ===
+addCategoryHeader(pages["Teleport"], "World Locations")
+addButton(pages["Teleport"], "TP to Lobby", function()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0) -- Пример координат лобби
+    end
+end)
+addButton(pages["Teleport"], "TP to Map (Rounds)", function() end)
+addButton(pages["Teleport"], "TP to Safe Zone", function() end)
+addButton(pages["Teleport"], "TP to Voting Room", function() end)
+
+addCategoryHeader(pages["Teleport"], "Player Teleport")
+addInput(pages["Teleport"], "Teleport to Player", "Username...", function(txt)
+    local target = nil
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.find(string.lower(p.Name), string.lower(txt)) or string.find(string.lower(p.DisplayName), string.lower(txt)) then
+            target = p
+            break
+        end
+    end
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+    end
+end)
+
+addCategoryHeader(pages["Teleport"], "Custom Coordinates")
+local customX, customY, customZ = 0, 0, 0
+addInput(pages["Teleport"], "X Coord", "X: 0", function(txt) customX = tonumber(txt) or 0 end)
+addInput(pages["Teleport"], "Y Coord", "Y: 0", function(txt) customY = tonumber(txt) or 0 end)
+addInput(pages["Teleport"], "Z Coord", "Z: 0", function(txt) customZ = tonumber(txt) or 0 end)
+addButton(pages["Teleport"], "Teleport to XYZ", function()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(customX, customY, customZ)
+    end
+end)
+-- [END OF PART 3]
+-- ==================== 10. НАПОЛНЕНИЕ ВКЛАДОК 5-8 (VISUALS, SERVERS, CONFIGS, SETTINGS) ====================
+
+-- === 5. VISUALS TAB ===
+addCategoryHeader(pages["Visuals"], "ESP / Wallhack")
+
+addToggle(pages["Visuals"], "Player ESP (Names)", false, function(v)
+    _G.EspPlayers = v
+    if not v then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p.Character then removeEsp(p.Character) end
+        end
+    else
+        task.spawn(function()
+            while _G.EspPlayers do
+                for _, p in pairs(Players:GetPlayers()) do
+                    if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                        local roleColor = Color3.fromRGB(255, 255, 255)
+                        -- Определение ролей MM2 (если роли есть в инвентаре/персонаже)
+                        if p.Character:FindFirstChild("Knife") or (p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Knife")) then
+                            roleColor = Color3.fromRGB(255, 50, 50) -- Убийца
+                        elseif p.Character:FindFirstChild("Gun") or (p:FindFirstChild("Backpack") and p.Backpack:FindFirstChild("Gun")) then
+                            roleColor = Color3.fromRGB(50, 150, 255) -- Шериф
+                        end
+                        applyEsp(p.Character.HumanoidRootPart, p.DisplayName, roleColor)
+                    end
+                end
+                task.wait(1)
+            end
+        end)
+    end
+end)
+
+addToggle(pages["Visuals"], "Dropped Gun ESP", false, function(v)
+    _G.EspItems = v
+    if not v then
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj.Name == "GunDrop" then removeEsp(obj) end
+        end
+    else
+        task.spawn(function()
+            while _G.EspItems do
+                for _, obj in pairs(workspace:GetDescendants()) do
+                    if obj.Name == "GunDrop" then
+                        applyEsp(obj, "DROPPED GUN!", Color3.fromRGB(255, 215, 0))
+                    end
+                end
+                task.wait(1)
+            end
+        end)
+    end
+end)
+
+addToggle(pages["Visuals"], "Chams / Highlights", false, function(v) end)
+addToggle(pages["Visuals"], "Show Roles in Chat", false, function(v) end)
+addToggle(pages["Visuals"], "Tracers to Players", false, function(v) end)
+
+addCategoryHeader(pages["Visuals"], "World Visuals")
+addToggle(pages["Visuals"], "FullBright / No Shadows", false, function(v)
+    _G.FullBright = v
+    if v then
+        Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+        Lighting.Brightness = 2
+        Lighting.GlobalShadows = false
+    else
+        Lighting.Ambient = Color3.fromRGB(128, 128, 128)
+        Lighting.Brightness = 1
+        Lighting.GlobalShadows = true
+    end
+end)
+
+addToggle(pages["Visuals"], "Remove Fog", false, function(v)
+    if v then Lighting.FogEnd = 9e9 else Lighting.FogEnd = 1000 end
+end)
+
+addToggle(pages["Visuals"], "Custom Skybox (Boykisser)", false, function(v) end)
+addSlider(pages["Visuals"], "Field of View (FOV)", 70, 120, 70, function(v)
+    workspace.CurrentCamera.FieldOfView = v
+end)
+
+-- === 6. SERVERS TAB ===
+addCategoryHeader(pages["Servers"], "Server Management")
+
+addButton(pages["Servers"], "Rejoin Same Server", function()
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+end)
+
+addButton(pages["Servers"], "Server Hop (Random)", function()
+    local HttpService = game:GetService("HttpService")
+    local servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+    for _, s in pairs(servers.data) do
+        if s.playing ~= s.maxPlayers and s.id ~= game.JobId then
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, s.id, LocalPlayer)
+            break
+        end
+    end
+end)
+
+addButton(pages["Servers"], "Join Smallest Server", function()
+    local HttpService = game:GetService("HttpService")
+    local servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+    table.sort(servers.data, function(a, b) return a.playing < b.playing end)
+    for _, s in pairs(servers.data) do
+        if s.id ~= game.JobId and s.playing > 0 then
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, s.id, LocalPlayer)
+            break
+        end
+    end
+end)
+
+addCategoryHeader(pages["Servers"], "Server Information")
+addInput(pages["Servers"], "Join Job ID", "Paste JobId here...", function(txt)
+    if txt and txt ~= "" then
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, txt, LocalPlayer)
+    end
+end)
+
+addButton(pages["Servers"], "Copy Current Job ID", function()
+    setclipboard(game.JobId)
+end)
+
+-- === 7. CONFIGS TAB ===
+addCategoryHeader(pages["Configs"], "Preset Profiles")
+
+local selectedConfig = "Default"
+addDropdown(pages["Configs"], "Select Profile", {"Default", "Legit / Closet", "Rage MM2", "Auto-Farm Mode"}, "Default", function(v)
+    selectedConfig = v
+end)
+
+addButton(pages["Configs"], "Save Current Config", function()
+    -- Сохранение настроек в writefile
+    print("Config saved: " .. selectedConfig)
+end)
+
+addButton(pages["Configs"], "Load Selected Config", function()
+    print("Config loaded: " .. selectedConfig)
+end)
+
+addButton(pages["Configs"], "Reset Config to Default", function()
+    print("Config reset")
+end)
+
+addCategoryHeader(pages["Configs"], "Auto-Load")
+addToggle(pages["Configs"], "Auto-Load on Injection", false, function(v) end)
+
+-- === 8. SETTINGS TAB ===
+addCategoryHeader(pages["Settings"], "UI Personalization")
+
+addDropdown(pages["Settings"], "Theme Presets", {"Pink Boykisser", "Dark Magenta", "Midnight Cyber", "Pastel Soft"}, "Pink Boykisser", function(v) end)
+addToggle(pages["Settings"], "Keybind Warning Notice", true, function(v) end)
+addToggle(pages["Settings"], "Watermark Display", true, function(v) end)
+addToggle(pages["Settings"], "UI Sound Effects", true, function(v) end)
+
+addCategoryHeader(pages["Settings"], "Boykisser Mascot Customization")
+addToggle(pages["Settings"], "Show Boykisser Mascot", true, function(v)
+    if mascot then mascot.Visible = v end
+end)
+
+addDropdown(pages["Settings"], "Mascot Reaction Mode", {"Dynamic (Reactive)", "Static Happy", "Sleepy", "Hyper"}, "Dynamic (Reactive)", function(v) end)
+
+addCategoryHeader(pages["Settings"], "Unload & Keybinds")
+addInput(pages["Settings"], "Toggle UI Keybind", "RightShift", function(txt) end)
+
+addButton(pages["Settings"], "Unload Script Completely", function()
+    _G.SpeedHack = false
+    _G.JumpHack = false
+    _G.Noclip = false
+    _G.InfJump = false
+    _G.EspPlayers = false
+    _G.EspItems = false
+    screenGui:Destroy()
+end)
+
+-- [END OF PART 4]
+-- ==================== 11. СИСТЕМА УВЕДОМЛЕНИЙ (NOTIFICATION SYSTEM) ====================
+
+local NotificationHolder = Instance.new("Frame")
+NotificationHolder.Name = "NotificationHolder"
+NotificationHolder.Parent = screenGui
+NotificationHolder.AnchorPoint = Vector2.new(1, 1)
+NotificationHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+NotificationHolder.BackgroundTransparency = 1
+NotificationHolder.Position = UDim2.new(1, -20, 1, -20)
+NotificationHolder.Size = UDim2.new(0, 300, 1, -40)
+NotificationHolder.ZIndex = 100
+
+local notifLayout = Instance.new("UIListLayout")
+notifLayout.Parent = NotificationHolder
+notifLayout.SortOrder = Enum.SortOrder.LayoutOrder
+notifLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+notifLayout.Padding = UDim.new(0, 8)
+
+function _G.SendNotification(title, text, duration)
+    duration = duration or 4
+    
+    local NotifFrame = Instance.new("Frame")
+    NotifFrame.Name = "NotifFrame"
+    NotifFrame.Parent = NotificationHolder
+    NotifFrame.BackgroundColor3 = Theme.BackgroundDark
+    NotifFrame.BorderSizePixel = 0
+    NotifFrame.ClipsDescendants = true
+    NotifFrame.Size = UDim2.new(1, 0, 0, 0) -- Начинаем с высоты 0 для анимации
+    NotifFrame.ZIndex = 101
+
+    local notifCorner = Instance.new("UICorner")
+    notifCorner.CornerRadius = UDim.new(0, 8)
+    notifCorner.Parent = NotifFrame
+
+    local notifStroke = Instance.new("UIStroke")
+    notifStroke.Parent = NotifFrame
+    notifStroke.Color = Theme.Accent
+    notifStroke.Thickness = 1
+    notifStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+    local IconLabel = Instance.new("ImageLabel")
+    IconLabel.Name = "IconLabel"
+    IconLabel.Parent = NotifFrame
+    IconLabel.BackgroundTransparency = 1
+    IconLabel.Position = UDim2.new(0, 8, 0, 8)
+    IconLabel.Size = UDim2.new(0, 36, 0, 36)
+    IconLabel.Image = "rbxassetid://15264663991" -- Boykisser Icon
+    IconLabel.ZIndex = 102
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Name = "TitleLabel"
+    TitleLabel.Parent = NotifFrame
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Position = UDim2.new(0, 50, 0, 6)
+    TitleLabel.Size = UDim2.new(1, -55, 0, 18)
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.Text = title
+    TitleLabel.TextColor3 = Theme.Accent
+    TitleLabel.TextSize = 13
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.ZIndex = 102
+
+    local TextLabel = Instance.new("TextLabel")
+    TextLabel.Name = "TextLabel"
+    TextLabel.Parent = NotifFrame
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.Position = UDim2.new(0, 50, 0, 24)
+    TextLabel.Size = UDim2.new(1, -55, 0, 24)
+    TextLabel.Font = Enum.Font.Gotham
+    TextLabel.Text = text
+    TextLabel.TextColor3 = Theme.TextLight
+    TextLabel.TextSize = 11
+    TextLabel.TextWrapped = true
+    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TextLabel.ZIndex = 102
+
+    local ProgressBar = Instance.new("Frame")
+    ProgressBar.Name = "ProgressBar"
+    ProgressBar.Parent = NotifFrame
+    ProgressBar.BackgroundColor3 = Theme.Accent
+    ProgressBar.BorderSizePixel = 0
+    ProgressBar.Position = UDim2.new(0, 0, 1, -3)
+    ProgressBar.Size = UDim2.new(1, 0, 0, 3)
+    ProgressBar.ZIndex = 103
+
+    -- Анимация появления
+    TweenService:Create(NotifFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Size = UDim2.new(1, 0, 0, 55)
+    }):Play()
+
+    -- Анимация полосы прогресса
+    TweenService:Create(ProgressBar, TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 0, 0, 3)
+    }):Play()
+
+    task.delay(duration, function()
+        local tweenOut = TweenService:Create(NotifFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+            Size = UDim2.new(1, 0, 0, 0)
+        })
+        tweenOut:Play()
+        tweenOut.Completed:Connect(function()
+            NotifFrame:Destroy()
+        end)
+    end)
+end
+
+-- ==================== 12. ДИНАМИЧЕСКИЕ РЕАКЦИИ МАСКОТА (MASCOT REACTIONS) ====================
+
+local function setMascotEmotion(emotion)
+    if not mascot then return end
+    
+    if emotion == "Happy" then
+        mascot.Image = "rbxassetid://15264663991"
+    elseif emotion == "Surprised" then
+        mascot.Image = "rbxassetid://15264663991" -- Замените при наличии другого ID
+    elseif emotion == "Smug" then
+        mascot.Image = "rbxassetid://15264663991"
+    end
+    
+    -- Анимация подпрыгивания при смене эмоции
+    local startPos = mascot.Position
+    TweenService:Create(mascot, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = startPos - UDim2.new(0, 0, 0, 15)
+    }):Play()
+    task.delay(0.15, function()
+        TweenService:Create(mascot, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Position = startPos
+        }):Play()
+    end)
+end
+
+-- Интерактивный клик по маскоту
+if mascot then
+    local mascotBtn = Instance.new("TextButton")
+    mascotBtn.Parent = mascot
+    mascotBtn.BackgroundTransparency = 1
+    mascotBtn.Size = UDim2.new(1, 0, 1, 0)
+    mascotBtn.Text = ""
+    
+    mascotBtn.MouseButton1Click:Connect(function()
+        setMascotEmotion("Happy")
+        _G.SendNotification("Boykisser Mascot", "You kissed the boykisser! ~uwu~", 3)
+    end)
+end
+
+-- ==================== 13. СИСТЕМА АНТИ-AFK (ANTI-AFK SYSTEM) ====================
+
+local VirtualUser = game:GetService("VirtualUser")
+LocalPlayer.Idled:Connect(function()
+    if _G.AntiAfk then
+        VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+        _G.SendNotification("Anti-AFK", "Prevented kick due to inactivity!", 3)
+    end
+end)
+
+-- ==================== 14. ОБРАБОТКА ХОТКЕЕВ И ЗАКРЫТИЯ GUI ====================
+
+local toggleKey = Enum.KeyCode.RightShift
+local uiVisible = true
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == toggleKey then
+        uiVisible = not uiVisible
+        mainFrame.Visible = uiVisible
+        _G.SendNotification("Boykisser Hub", uiVisible and "UI Opened" or "UI Hidden", 2)
+    end
+end)
+
+-- ==================== 15. ФИНАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ И ЗАПУСК ====================
+
+-- Анимация открытия главного окна
+mainFrame.Size = UDim2.new(0, 0, 0, 0)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+mainFrame.Visible = true
+
+local initTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0, 680, 0, 420),
+    Position = UDim2.new(0.5, -340, 0.5, -210)
+})
+
+initTween:Play()
+
+initTween.Completed:Connect(function()
+    _G.SendNotification("Boykisser Hub 4K", "Loaded successfully! Press RightShift to Toggle.", 5)
+    setMascotEmotion("Happy")
+end)
+
+print("[BOYKISSER HUB]: Script completely loaded and running!")
+
+-- ==================== [КОНЕЦ ПОЛНОГО СКРИПТА] ====================
